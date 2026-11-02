@@ -2,6 +2,7 @@ import React, { forwardRef, useState, useEffect, useRef } from 'react';
 import { CoverConfig, FooterConfig, HighlightConfig, LayerPosition, LayerPositions, LayerVisibility, LogoConfig } from '../types';
 import { DEFAULT_TEACHER_BIO_CONFIG, DEFAULT_TEACHER_COMPARE_CONFIG } from '../data/presets';
 import { TeacherDoodles } from './TeacherDoodles';
+import { renderAnswerSheet } from './TeacherShowcaseLayouts';
 import {
   Move,
   RotateCcw,
@@ -1379,6 +1380,18 @@ export const CoverCanvasPreview = forwardRef<HTMLDivElement, CoverCanvasPreviewP
       ) : config.template === 'teacher-compare' ? (
         (() => {
           const compareData = config.teacherCompare || DEFAULT_TEACHER_COMPARE_CONFIG;
+          const designStyle = compareData.designStyle === 'classic' ? 'classic' : 'answer-sheet';
+          if (designStyle !== 'classic') {
+            const ctx = {
+              compare: compareData,
+              config,
+              width,
+              height,
+              wrap: renderInteractiveLayerWrapper,
+              renderLogo: () => renderLogoLayer('relative'),
+            };
+            return renderAnswerSheet(ctx);
+          }
           const teachers = compareData.teachers || [];
           const count = teachers.length;
           const isDuel = compareData.layoutStyle === 'vs-duel' || count === 2;

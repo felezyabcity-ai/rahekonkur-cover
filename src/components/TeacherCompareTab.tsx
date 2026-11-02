@@ -150,8 +150,9 @@ export const TeacherCompareTab: React.FC<TeacherCompareTabProps> = ({
   };
 
   const handleDeleteTeacher = (index: number) => {
-    if (compareConfig.teachers.length <= 2) {
-      onNotify('برای مقایسه حداقل باید ۲ استاد در کاور وجود داشته باشند', 'info');
+    const minTeachers = compareConfig.designStyle === 'classic' ? 2 : 1;
+    if (compareConfig.teachers.length <= minTeachers) {
+      onNotify(minTeachers === 1 ? 'حداقل یک استاد باید در کاور باشد' : 'برای مقایسه حداقل باید ۲ استاد در کاور وجود داشته باشند', 'info');
       return;
     }
     const teacherName = compareConfig.teachers[index]?.name || 'استاد';
@@ -389,6 +390,69 @@ export const TeacherCompareTab: React.FC<TeacherCompareTabProps> = ({
             );
           })}
         </div>
+      </div>
+
+      {/* Cover design */}
+      <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 space-y-3">
+        <h4 className="text-xs font-bold text-slate-200 border-b border-slate-800 pb-2">طرح کاور</h4>
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            ['answer-sheet', 'پاسخ‌برگ راه کنکور', 'هم‌خوان با هویت سایت؛ ۱ تا ۳ دبیر'],
+            ['classic', 'کلاسیک', 'طرح قبلی (VS)'],
+          ] as const).map(([id, label, hint]) => {
+            const active = (compareConfig.designStyle === 'classic' ? 'classic' : 'answer-sheet') === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => updateCompareConfig({ designStyle: id })}
+                className={`p-2 rounded-xl border text-right transition-colors ${active ? 'border-amber-500 bg-amber-500/10' : 'border-slate-700 bg-slate-900 hover:border-slate-500'}`}
+              >
+                <div className="text-xs font-bold text-white">{label}</div>
+                <div className="text-[10px] text-slate-500 mt-0.5">{hint}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        {compareConfig.designStyle !== 'classic' && (
+          <>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                ['titleHighlight', 'کلمه‌ی هایلایت در تیتر', 'مثال: زیست'],
+                ['namePrefix', 'عنوان بالای نام', 'دبیر'],
+                ['bylinePrefix', 'متن کنار نام تحلیلگر', 'تحلیل'],
+                ['bylineName', 'نام تحلیلگر (اختیاری)', 'مثال: امیر ...'],
+              ] as const).map(([field, label, ph]) => (
+                <div key={field}>
+                  <label className="block text-[10px] font-semibold text-slate-400 mb-1">{label}:</label>
+                  <input
+                    type="text"
+                    value={(compareConfig as any)[field] ?? ''}
+                    onChange={(e) => updateCompareConfig({ [field]: e.target.value } as any)}
+                    placeholder={ph}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-400">رنگ تأکید:</label>
+              <input
+                type="color"
+                value={compareConfig.designAccent || '#E8456B'}
+                onChange={(e) => updateCompareConfig({ designAccent: e.target.value })}
+                className="w-9 h-7 rounded border border-slate-700 bg-transparent cursor-pointer"
+              />
+              {compareConfig.designAccent && (
+                <button type="button" onClick={() => updateCompareConfig({ designAccent: undefined })} className="text-[10px] text-slate-400 hover:text-white">صورتی سایت</button>
+              )}
+            </div>
+            <p className="text-[10px] text-slate-500 leading-5">
+              با یک دبیر، کاور «معرفی دبیر» می‌شود و سه نکته‌ی اول دبیر کنار عکس می‌آید. «پیش‌عنوان» = برچسب بالای تیتر. برای کیفیت، عکس با عرض حداقل ۸۰۰ پیکسل آپلود کنید.
+            </p>
+          </>
+        )}
       </div>
 
       {/* Main Titles & Kicker */}

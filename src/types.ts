@@ -142,6 +142,13 @@ export interface TeacherCompareConfig {
   showVsBadge: boolean;
   subjectDoodles: 'physics' | 'math' | 'chemistry' | 'biology' | 'general' | 'none';
   teachers: TeacherCompareItem[];
+  // Answer-sheet design (rahekonkur identity)
+  designStyle?: 'answer-sheet' | 'classic' | string;
+  designAccent?: string;
+  titleHighlight?: string;
+  bylinePrefix?: string;
+  bylineName?: string;
+  namePrefix?: string;
 }
 
 export interface CoverConfig {
